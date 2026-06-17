@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-06-17 10:39:42",
+  "hottest_city": "Ambala",
+  "coolest_city": "Hisar",
+  "most_polluted": "Ambala",
+  "cleanest": "Chandigarh",
+  "temp_aqi_correlation": 0.57,
+  "anomalies": [
+    "Ambala"
+  ]
+}

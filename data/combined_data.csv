@@ -1,0 +1,6 @@
+city,temperature,humidity,weather,wind_speed,timestamp,aqi_value,location_name,aqi_timestamp
+Chandigarh,31.41,38,scattered clouds,3.11,2026-06-16 20:30:29,10.17,"Sector-6, Panchkula - HSPCB ",2026-06-16 20:30:32
+Panchkula,30.99,40,scattered clouds,3.29,2026-06-16 20:30:29,10.17,"Sector-6, Panchkula - HSPCB ",2026-06-16 20:30:33
+Ambala,34.26,31,few clouds,0.95,2026-06-16 20:30:29,21.98,"Patti Mehar, Ambala - HSPCB",2026-06-16 20:30:34
+Kurukshetra,30.81,53,broken clouds,10.63,2026-06-16 20:30:29,19.07,"Sector-7, Kurukshetra - HSPCB",2026-06-16 20:30:35
+Hisar,29.46,58,overcast clouds,4.47,2026-06-16 20:30:30,14.05,"Urban Estate-II, Hisar - HSPCB",2026-06-16 20:30:36
