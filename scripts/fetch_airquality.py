@@ -1,12 +1,21 @@
 import requests
 import os
 import pandas as pd
+from sqlalchemy import create_engine
+from urllib.parse import quote_plus
 from dotenv import load_dotenv
 from datetime import datetime
 
 load_dotenv()
 
 API_KEY = os.getenv("OPENAQ_API_KEY")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PORT = os.getenv("DB_PORT", "5432")
+
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
 CITIES = [
     {"name": "Chandigarh", "lat": 30.7333, "lon": 76.7794},
@@ -18,24 +27,20 @@ CITIES = [
 
 def fetch_airquality(city):
     headers = {"X-API-Key": API_KEY}
-
-    # Get nearest location
     url = f"https://api.openaq.org/v3/locations?coordinates={city['lat']},{city['lon']}&radius=25000&limit=1"
     response = requests.get(url, headers=headers)
     data = response.json()
 
     if not data.get("results"):
-        return {"city": city["name"], "aqi_value": None, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        return {"city": city["name"], "aqi_value": None, "location_name": "Unknown", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
     location = data["results"][0]
     location_id = location["id"]
 
-    # Get latest readings
     meas_url = f"https://api.openaq.org/v3/locations/{location_id}/latest"
     meas_response = requests.get(meas_url, headers=headers)
     meas_data = meas_response.json()
 
-    # Just grab first available value
     aqi_value = None
     if meas_data.get("results"):
         aqi_value = meas_data["results"][0]["value"]
@@ -55,6 +60,12 @@ if __name__ == "__main__":
         print(result)
         results.append(result)
 
+    # Save to CSV
     df = pd.DataFrame(results)
     df.to_csv("data/airquality_data.csv", index=False)
-    print("\n✅ Air quality data saved to data/airquality_data.csv")
+
+    # Save to database
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df.to_sql("airquality", engine, if_exists="append", index=False)
+
+    print("\n✅ Air quality data saved to CSV and database")
