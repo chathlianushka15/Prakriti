@@ -1,58 +1,64 @@
 import pandas as pd
 import json
+import os
+import sqlalchemy
+from urllib.parse import quote_plus
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def analyze():
-    df = pd.read_csv("data/combined_data.csv")
+    DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))
+    engine = sqlalchemy.create_engine(
+        f'postgresql://postgres:{DB_PASSWORD}@localhost/prakriti'
+    )
+    weather_df = pd.read_sql('SELECT * FROM weather ORDER BY timestamp ASC', engine)
+    aqi_df = pd.read_sql('SELECT * FROM airquality ORDER BY timestamp ASC', engine)
+    df = pd.merge(weather_df, aqi_df, on='city', suffixes=('_weather', '_aqi'))
 
     print("=" * 50)
-    print("🌿 PRAKRITI — ENVIRONMENTAL ANALYSIS")
+    print("PRAKRITI — ENVIRONMENTAL ANALYSIS")
     print("=" * 50)
 
-    # 1. Basic stats
-    print("\n📊 TEMPERATURE SUMMARY (°C)")
-    print(df[["city", "temperature"]].to_string(index=False))
+    print("\nTEMPERATURE SUMMARY (C)")
+    print(df.groupby("city")["temperature"].mean().round(2).to_string())
 
-    print("\n💧 HUMIDITY SUMMARY (%)")
-    print(df[["city", "humidity"]].to_string(index=False))
+    print("\nHUMIDITY SUMMARY (%)")
+    print(df.groupby("city")["humidity"].mean().round(2).to_string())
 
-    print("\n🌫️ AIR QUALITY SUMMARY (AQI)")
-    print(df[["city", "aqi_value"]].to_string(index=False))
+    print("\nAIR QUALITY SUMMARY (AQI)")
+    print(df.groupby("city")["aqi_value"].mean().round(2).to_string())
 
-    # 2. Hottest and coolest city
     hottest = df.loc[df["temperature"].idxmax()]
     coolest = df.loc[df["temperature"].idxmin()]
-    print(f"\n🔥 Hottest city: {hottest['city']} at {hottest['temperature']}°C")
-    print(f"❄️  Coolest city: {coolest['city']} at {coolest['temperature']}°C")
+    print(f"\nHottest city: {hottest['city']} at {hottest['temperature']}C")
+    print(f"Coolest city: {coolest['city']} at {coolest['temperature']}C")
 
-    # 3. Most and least polluted
     most_polluted = df.loc[df["aqi_value"].idxmax()]
     cleanest = df.loc[df["aqi_value"].idxmin()]
-    print(f"\n😷 Most polluted: {most_polluted['city']} with AQI {most_polluted['aqi_value']}")
-    print(f"✅ Cleanest air: {cleanest['city']} with AQI {cleanest['aqi_value']}")
+    print(f"\nMost polluted: {most_polluted['city']} with AQI {most_polluted['aqi_value']}")
+    print(f"Cleanest air: {cleanest['city']} with AQI {cleanest['aqi_value']}")
 
-    # 4. Correlation between temperature and AQI
     correlation = df["temperature"].corr(df["aqi_value"])
-    print(f"\n🔬 Correlation between temperature and AQI: {correlation:.2f}")
+    print(f"\nCorrelation between temperature and AQI: {correlation:.2f}")
     if correlation > 0.5:
-        print("   → Higher temperature linked to worse air quality")
+        print("   Higher temperature linked to worse air quality")
     elif correlation < -0.5:
-        print("   → Higher temperature linked to better air quality")
+        print("   Higher temperature linked to better air quality")
     else:
-        print("   → No strong correlation found yet (need more data)")
+        print("   No strong correlation found yet")
 
-    # 5. Anomaly detection — cities with unusually high AQI
     mean_aqi = df["aqi_value"].mean()
     std_aqi = df["aqi_value"].std()
-    print(f"\n⚠️  ANOMALY DETECTION")
+    print(f"\nANOMALY DETECTION")
     print(f"   Mean AQI: {mean_aqi:.2f} | Std Dev: {std_aqi:.2f}")
     anomalies = df[df["aqi_value"] > mean_aqi + std_aqi]
     if not anomalies.empty:
-        print(f"   🚨 Anomalies detected in: {', '.join(anomalies['city'].tolist())}")
+        print(f"   Anomalies detected in: {', '.join(anomalies['city'].unique().tolist())}")
     else:
-        print("   ✅ No anomalies detected")
+        print("   No anomalies detected")
 
-    # Save summary
     summary = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "hottest_city": hottest["city"],
@@ -60,13 +66,13 @@ def analyze():
         "most_polluted": most_polluted["city"],
         "cleanest": cleanest["city"],
         "temp_aqi_correlation": round(correlation, 2),
-        "anomalies": anomalies["city"].tolist()
+        "anomalies": anomalies["city"].unique().tolist()
     }
 
     with open("data/analysis_summary.json", "w") as f:
         json.dump(summary, f, indent=2)
 
-    print(f"\n✅ Analysis saved to data/analysis_summary.json")
+    print(f"\nAnalysis saved to data/analysis_summary.json")
     print("=" * 50)
 
 if __name__ == "__main__":

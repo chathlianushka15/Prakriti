@@ -1,16 +1,14 @@
-import requests
-import os
-import json
+import sqlalchemy
+import pandas as pd
+from urllib.parse import quote_plus
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-API_KEY = os.getenv("OPENAQ_API_KEY")
-headers = {"X-API-Key": API_KEY}
+engine = sqlalchemy.create_engine(
+    f'postgresql://postgres:{quote_plus(os.getenv("DB_PASSWORD"))}@localhost/prakriti'
+)
 
-r = requests.get("https://api.openaq.org/v3/locations?coordinates=30.7333,76.7794&radius=25000&limit=1", headers=headers)
-data = r.json()
-location_id = data["results"][0]["id"]
-
-r2 = requests.get(f"https://api.openaq.org/v3/locations/{location_id}/latest", headers=headers)
-print(json.dumps(r2.json()["results"][0], indent=2))
+df = pd.read_sql('SELECT city, temperature, timestamp FROM weather ORDER BY timestamp ASC', engine)
+print(df.to_string())

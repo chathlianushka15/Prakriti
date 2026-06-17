@@ -1,6 +1,6 @@
 city,temperature,humidity,weather,wind_speed,timestamp
-Chandigarh,38.08,23,few clouds,3.34,2026-06-17 11:24:01
-Panchkula,38.13,23,few clouds,3.32,2026-06-17 11:24:01
-Ambala,38.29,24,few clouds,2.02,2026-06-17 11:24:01
-Kurukshetra,38.96,24,scattered clouds,2.19,2026-06-17 11:24:01
-Hisar,36.55,32,clear sky,2.23,2026-06-17 11:24:01
+Chandigarh,38.95,21,scattered clouds,1.79,2026-06-17 17:09:34
+Panchkula,38.72,22,broken clouds,2.19,2026-06-17 17:09:34
+Ambala,40.17,19,broken clouds,2.33,2026-06-17 17:09:34
+Kurukshetra,40.13,19,scattered clouds,4.59,2026-06-17 17:09:34
+Hisar,39.49,24,few clouds,5.12,2026-06-17 17:09:34
