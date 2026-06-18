@@ -8,21 +8,24 @@ import os
 
 load_dotenv()
 
-# Works both locally (.env) and on Streamlit Cloud (secrets)
 try:
     DB_PASSWORD = quote_plus(st.secrets["SUPABASE_PASSWORD"])
     DB_USER = st.secrets.get("SUPABASE_USER", "postgres")
     DB_HOST = st.secrets["SUPABASE_HOST"]
     DB_PORT = st.secrets.get("SUPABASE_PORT", "5432")
     DB_NAME = st.secrets.get("SUPABASE_DB", "postgres")
-except:
+    st.write(f"Debug: Connected to {DB_HOST}")
+except Exception as e:
+    st.error(f"Secrets error: {e}")
     DB_PASSWORD = quote_plus(os.getenv("SUPABASE_PASSWORD"))
     DB_USER = os.getenv("SUPABASE_USER", "postgres")
     DB_HOST = os.getenv("SUPABASE_HOST")
     DB_PORT = os.getenv("SUPABASE_PORT", "5432")
     DB_NAME = os.getenv("SUPABASE_DB")
-
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+engine = create_engine(
+    f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
+    connect_args={"sslmode": "require"}
+)
 
 st.set_page_config(page_title="Prakriti", page_icon="🌿", layout="wide")
 
