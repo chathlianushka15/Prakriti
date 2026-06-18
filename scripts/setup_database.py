@@ -13,7 +13,13 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 
 from urllib.parse import quote_plus
 password = quote_plus(DB_PASSWORD)
-engine = create_engine(f"postgresql://{DB_USER}:{password}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+SUPA_HOST = os.getenv("SUPABASE_HOST")
+SUPA_DB = os.getenv("SUPABASE_DB")
+SUPA_USER = os.getenv("SUPABASE_USER")
+SUPA_PASSWORD = quote_plus(os.getenv("SUPABASE_PASSWORD"))
+SUPA_PORT = os.getenv("SUPABASE_PORT")
+
+engine = create_engine(f"postgresql://{SUPA_USER}:{SUPA_PASSWORD}@{SUPA_HOST}:{SUPA_PORT}/{SUPA_DB}")
 
 def setup():
     with engine.connect() as conn:
