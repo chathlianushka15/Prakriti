@@ -14,7 +14,7 @@ try:
     DB_HOST = st.secrets["SUPABASE_HOST"]
     DB_PORT = st.secrets.get("SUPABASE_PORT", "5432")
     DB_NAME = st.secrets.get("SUPABASE_DB", "postgres")
-    
+
 except Exception as e:
     st.error(f"Secrets error: {e}")
     DB_PASSWORD = quote_plus(os.getenv("SUPABASE_PASSWORD"))
