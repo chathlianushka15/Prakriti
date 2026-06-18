@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-06-17 17:15:38",
+  "timestamp": "2026-06-18 09:20:40",
   "hottest_city": "Ambala",
-  "coolest_city": "Hisar",
+  "coolest_city": "Panchkula",
   "most_polluted": "Ambala",
-  "cleanest": "Chandigarh",
-  "temp_aqi_correlation": 0.04,
+  "cleanest": "Kurukshetra",
+  "temp_aqi_correlation": 0.13,
   "anomalies": [
     "Ambala",
     "Kurukshetra"
